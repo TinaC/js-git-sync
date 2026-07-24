@@ -1,0 +1,16 @@
+apiVersion: asset.sap/v1
+kind: Asset
+
+metadata:
+  name: n8n
+  version: 1.0.0
+  description: n8n workflow that triggers on a sales order event, fetches order and pricing data from SAP S/4HANA SD, invokes the discount strategy AI agent, and returns recommendations to the sales rep.
+
+type: n8n-workflow
+
+sourceRoot: "workflows"
+
+provides:
+  workflows:
+    - definitionFile: discount-strategy.n8n.json
+      name: discount-strategy

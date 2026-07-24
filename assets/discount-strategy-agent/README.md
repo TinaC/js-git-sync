@@ -1,0 +1,13 @@
+# Discount Strategy Agent
+
+An AI agent that analyzes SAP S/4HANA sales orders and margin targets to provide contextualized discount strategy recommendations for sales representatives
+
+## Overview
+
+Uses A2A Protocol, LangGraph, LiteLLM, and SAP Cloud SDK.
+
+## Structure
+
+- `app/main.py` - A2A server entry
+- `app/agent_executor.py` - Request handling
+- `app/agent.py` - Agent logic

@@ -1,0 +1,11 @@
+apiVersion: solution.sap/v1
+kind: Solution
+
+metadata:
+  name: discount-strategy-agent-118b4
+  version: 1.0.0
+  description: AI-powered discount strategy suggestion agent that analyzes customer orders and margin targets from SAP S/4HANA SD, providing sales reps with contextualized discount recommendations via n8n workflow orchestration and a Python AI agent.
+
+assets:
+  - ref: ./assets/n8n/asset.yaml
+  - ref: ./assets/discount-strategy-agent/asset.yaml

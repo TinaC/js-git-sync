@@ -1,0 +1,260 @@
+[
+  {
+    "name": "get_metadata_api_sales_order_srv",
+    "title": "get_metadata_api_sales_order_srv",
+    "description": "Get metadata of the OData service.",
+    "odataType": {
+      "metadataRequest": {}
+    }
+  },
+  {
+    "name": "batch_for_api_sales_order_srv",
+    "title": "batch_for_api_sales_order_srv",
+    "description": "Execute multiple OData operations in a single batch request.",
+    "odataType": {
+      "batchRequest": {}
+    }
+  },
+  {
+    "name": "list_a_salesorder_for_api_sales_order_srv",
+    "title": "list_A_SalesOrder_for_api_sales_order_srv",
+    "description": "Retrieve a list of entities from the A_SalesOrder collection.",
+    "odataType": {
+      "entitySet": {
+        "name": "A_SalesOrder",
+        "crudOperation": "read",
+        "parameters": [
+          {
+            "name": "filter"
+          },
+          {
+            "name": "select"
+          },
+          {
+            "name": "orderby"
+          },
+          {
+            "name": "top"
+          },
+          {
+            "name": "skip"
+          },
+          {
+            "name": "expand"
+          },
+          {
+            "name": "inlinecount"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "name": "get_a_salesorder_for_api_sales_order_srv",
+    "title": "get_A_SalesOrder_for_api_sales_order_srv",
+    "description": "Retrieve a single sales order by key.",
+    "odataType": {
+      "entitySet": {
+        "name": "A_SalesOrder",
+        "crudOperation": "readByKey",
+        "parameters": [
+          {
+            "name": "SalesOrder",
+            "newParameterName": "salesorder"
+          },
+          {
+            "name": "select"
+          },
+          {
+            "name": "expand"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "name": "list_a_salesorderitem_for_api_sales_order_srv",
+    "title": "list_A_SalesOrderItem_for_api_sales_order_srv",
+    "description": "Retrieve a list of entities from the A_SalesOrderItem collection.",
+    "odataType": {
+      "entitySet": {
+        "name": "A_SalesOrderItem",
+        "crudOperation": "read",
+        "parameters": [
+          {
+            "name": "filter"
+          },
+          {
+            "name": "select"
+          },
+          {
+            "name": "orderby"
+          },
+          {
+            "name": "top"
+          },
+          {
+            "name": "skip"
+          },
+          {
+            "name": "expand"
+          },
+          {
+            "name": "inlinecount"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "name": "get_a_salesorderitem_for_api_sales_order_srv",
+    "title": "get_A_SalesOrderItem_for_api_sales_order_srv",
+    "description": "Retrieve a single sales order item by key.",
+    "odataType": {
+      "entitySet": {
+        "name": "A_SalesOrderItem",
+        "crudOperation": "readByKey",
+        "parameters": [
+          {
+            "name": "SalesOrder",
+            "newParameterName": "salesorder"
+          },
+          {
+            "name": "SalesOrderItem",
+            "newParameterName": "salesorderitem"
+          },
+          {
+            "name": "select"
+          },
+          {
+            "name": "expand"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "name": "list_a_salesorderitemprelement_for_api_sales_order_srv",
+    "title": "list_A_SalesOrderItemPrElement_for_api_sales_order_srv",
+    "description": "Retrieve a list of pricing elements for sales order items.",
+    "odataType": {
+      "entitySet": {
+        "name": "A_SalesOrderItemPrElement",
+        "crudOperation": "read",
+        "parameters": [
+          {
+            "name": "filter"
+          },
+          {
+            "name": "select"
+          },
+          {
+            "name": "orderby"
+          },
+          {
+            "name": "top"
+          },
+          {
+            "name": "skip"
+          },
+          {
+            "name": "expand"
+          },
+          {
+            "name": "inlinecount"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "name": "list_to_item_in_a_salesorder_for_api_sales_order_srv",
+    "title": "list_to_Item_in_A_SalesOrder_for_api_sales_order_srv",
+    "description": "Navigate from A_SalesOrder to related line items via to_Item navigation property.",
+    "odataType": {
+      "entitySet": {
+        "name": "A_SalesOrder",
+        "navigationProperty": {
+          "name": "to_Item",
+          "crudOperation": "read",
+          "parameters": [
+            {
+              "name": "filter"
+            },
+            {
+              "name": "select"
+            },
+            {
+              "name": "orderby"
+            },
+            {
+              "name": "top"
+            },
+            {
+              "name": "skip"
+            },
+            {
+              "name": "expand"
+            },
+            {
+              "name": "inlinecount"
+            }
+          ]
+        },
+        "parameters": [
+          {
+            "name": "SalesOrder",
+            "newParameterName": "salesorder"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "name": "list_to_pricingelement_in_a_salesorderitem_for_api_sales_order_srv",
+    "title": "list_to_PricingElement_in_A_SalesOrderItem_for_api_sales_order_srv",
+    "description": "Navigate from A_SalesOrderItem to pricing elements via to_PricingElement navigation property.",
+    "odataType": {
+      "entitySet": {
+        "name": "A_SalesOrderItem",
+        "navigationProperty": {
+          "name": "to_PricingElement",
+          "crudOperation": "read",
+          "parameters": [
+            {
+              "name": "filter"
+            },
+            {
+              "name": "select"
+            },
+            {
+              "name": "orderby"
+            },
+            {
+              "name": "top"
+            },
+            {
+              "name": "skip"
+            },
+            {
+              "name": "expand"
+            },
+            {
+              "name": "inlinecount"
+            }
+          ]
+        },
+        "parameters": [
+          {
+            "name": "SalesOrder",
+            "newParameterName": "salesorder"
+          },
+          {
+            "name": "SalesOrderItem",
+            "newParameterName": "salesorderitem"
+          }
+        ]
+      }
+    }
+  }
+]

@@ -1,0 +1,205 @@
+{
+    "name": "Discount Strategy Agent",
+    "description": "Webhook-triggered workflow that uses mock SAP S/4HANA sales order and pricing data, then calls the AI discount strategy agent to generate contextualized discount recommendations for sales reps.",
+    "nodes": [
+        {
+            "id": "n1",
+            "name": "Sales Order Trigger",
+            "type": "n8n-nodes-base.webhook",
+            "typeVersion": 2.1,
+            "position": [0, 280],
+            "parameters": {
+                "path": "discount-strategy-5c0ddcaf-e203-4e63-afb1-8b1c26d4575a",
+                "httpMethod": "POST",
+                "responseMode": "responseNode"
+            }
+        },
+        {
+            "id": "n2",
+            "name": "Mock Sales Order Data",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [240, 280],
+            "parameters": {
+                "jsCode": "// Mock SAP S/4HANA Sales Order response\n// Replace this node with an HTTP Request node pointing to your real SAP system\nconst salesOrderId = $input.item.json.salesOrderId || '4500001234';\n\nreturn [{\n  json: {\n    d: {\n      SalesOrder: salesOrderId,\n      SoldToParty: 'CUST-001',\n      TotalNetAmount: '85000.00',\n      TransactionCurrency: 'USD',\n      PricingDate: '/Date(1735689600000)/',\n      CustomerPriceGroup: 'PG01',\n      CustomerGroup: 'Z001',\n      to_Item: {\n        results: [\n          {\n            SalesOrderItem: '10',\n            Material: 'PROD-A100',\n            RequestedQuantity: '50',\n            NetAmount: '45000.00',\n            CostAmount: '31500.00',\n            MaterialGroup: 'MG01',\n            to_PricingElement: {\n              results: [\n                { ConditionType: 'PR00', ConditionRateValue: '900.00', ConditionCurrency: 'USD' },\n                { ConditionType: 'RB00', ConditionRateValue: '-3.00', ConditionCurrency: 'USD' }\n              ]\n            }\n          },\n          {\n            SalesOrderItem: '20',\n            Material: 'PROD-B200',\n            RequestedQuantity: '100',\n            NetAmount: '40000.00',\n            CostAmount: '30000.00',\n            MaterialGroup: 'MG02',\n            to_PricingElement: {\n              results: [\n                { ConditionType: 'PR00', ConditionRateValue: '400.00', ConditionCurrency: 'USD' },\n                { ConditionType: 'RB00', ConditionRateValue: '-2.50', ConditionCurrency: 'USD' }\n              ]\n            }\n          }\n        ]\n      }\n    }\n  }\n}];"
+            }
+        },
+        {
+            "id": "n3",
+            "name": "Order Data Valid",
+            "type": "n8n-nodes-base.if",
+            "typeVersion": 2.3,
+            "position": [480, 280],
+            "parameters": {
+                "conditions": {
+                    "options": {
+                        "caseSensitive": true,
+                        "leftValue": "",
+                        "typeValidation": "strict"
+                    },
+                    "conditions": [
+                        {
+                            "id": "c1",
+                            "leftValue": "={{ $json.d && $json.d.SalesOrder }}",
+                            "rightValue": "",
+                            "operator": {
+                                "type": "string",
+                                "operation": "exists",
+                                "singleValue": true
+                            }
+                        }
+                    ],
+                    "combinator": "and"
+                }
+            }
+        },
+        {
+            "id": "n4",
+            "name": "Mock Pricing Conditions",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [720, 160],
+            "parameters": {
+                "jsCode": "// Mock SAP S/4HANA Pricing Condition Records response\n// Replace this node with an HTTP Request node pointing to your real SAP system\nconst soldToParty = $('Mock Sales Order Data').item.json.d.SoldToParty;\n\nreturn [{\n  json: {\n    d: {\n      results: [\n        {\n          ConditionType: 'RB00',\n          SoldToParty: soldToParty,\n          ConditionRateValue: '-3.00',\n          ConditionValidityStartDate: '/Date(1704067200000)/',\n          ConditionValidityEndDate: '/Date(1767225600000)/'\n        },\n        {\n          ConditionType: 'HA00',\n          SoldToParty: soldToParty,\n          ConditionRateValue: '-1.50',\n          ConditionValidityStartDate: '/Date(1704067200000)/',\n          ConditionValidityEndDate: '/Date(1767225600000)/'\n        },\n        {\n          ConditionType: 'K005',\n          SoldToParty: soldToParty,\n          ConditionRateValue: '-2.00',\n          ConditionValidityStartDate: '/Date(1704067200000)/',\n          ConditionValidityEndDate: '/Date(1751328000000)/'\n        }\n      ]\n    }\n  }\n}];"
+            }
+        },
+        {
+            "id": "n5",
+            "name": "Prepare Agent Payload",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [960, 160],
+            "parameters": {
+                "jsCode": "const salesOrderData = $('Mock Sales Order Data').item.json;\nconst pricingData = $json;\n\nconst orderHeader = salesOrderData.d || {};\nconst lineItems = (orderHeader.to_Item && orderHeader.to_Item.results) ? orderHeader.to_Item.results : [];\n\nconst items = lineItems.map(item => ({\n  material: item.Material,\n  requestedQuantity: item.RequestedQuantity,\n  netAmount: item.NetAmount,\n  costAmount: item.CostAmount,\n  materialGroup: item.MaterialGroup,\n  pricingElements: (item.to_PricingElement && item.to_PricingElement.results) ?\n    item.to_PricingElement.results.map(pe => ({\n      conditionType: pe.ConditionType,\n      conditionRateValue: pe.ConditionRateValue,\n      conditionCurrency: pe.ConditionCurrency\n    })) : []\n}));\n\nconst conditions = (pricingData.d && pricingData.d.results) ?\n  pricingData.d.results.map(c => ({\n    conditionType: c.ConditionType,\n    conditionRateValue: c.ConditionRateValue,\n    conditionValidityStartDate: c.ConditionValidityStartDate,\n    conditionValidityEndDate: c.ConditionValidityEndDate\n  })) : [];\n\nconst agentPayload = {\n  salesOrder: {\n    salesOrder: orderHeader.SalesOrder,\n    soldToParty: orderHeader.SoldToParty,\n    totalNetAmount: orderHeader.TotalNetAmount,\n    transactionCurrency: orderHeader.TransactionCurrency,\n    pricingDate: orderHeader.PricingDate,\n    customerPriceGroup: orderHeader.CustomerPriceGroup,\n    customerGroup: orderHeader.CustomerGroup\n  },\n  lineItems: items,\n  pricingConditions: conditions,\n  marginFloorPercent: $('Sales Order Trigger').item.json.marginFloorPercent || 0.25\n};\n\nreturn [{ json: { agentPayload } }];"
+            }
+        },
+        {
+            "id": "n6",
+            "name": "Call Discount Agent",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.4,
+            "position": [1200, 160],
+            "parameters": {
+                "method": "POST",
+                "url": "={{ $('Sales Order Trigger').item.json.agentBaseUrl + '/invoke' }}",
+                "sendBody": true,
+                "contentType": "json",
+                "bodyParameters": {
+                    "parameters": [
+                        {
+                            "name": "message",
+                            "value": "Analyze this sales order and recommend a discount strategy. Stay within the margin floor."
+                        },
+                        {
+                            "name": "context",
+                            "value": "={{ JSON.stringify($json.agentPayload) }}"
+                        }
+                    ]
+                },
+                "options": {}
+            }
+        },
+        {
+            "id": "n7",
+            "name": "Agent Response Valid",
+            "type": "n8n-nodes-base.if",
+            "typeVersion": 2.3,
+            "position": [1440, 160],
+            "parameters": {
+                "conditions": {
+                    "options": {
+                        "caseSensitive": true,
+                        "leftValue": "",
+                        "typeValidation": "strict"
+                    },
+                    "conditions": [
+                        {
+                            "id": "c2",
+                            "leftValue": "={{ $json.recommendation }}",
+                            "rightValue": "",
+                            "operator": {
+                                "type": "string",
+                                "operation": "exists",
+                                "singleValue": true
+                            }
+                        }
+                    ],
+                    "combinator": "and"
+                }
+            }
+        },
+        {
+            "id": "n8",
+            "name": "Format Recommendation",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [1680, 40],
+            "parameters": {
+                "jsCode": "const agentResponse = $json;\nconst triggerData = $('Sales Order Trigger').item.json;\nconst salesOrderData = $('Mock Sales Order Data').item.json;\n\nconst recommendation = agentResponse.recommendation || {};\n\nconst output = {\n  salesOrderId: triggerData.salesOrderId,\n  customerId: salesOrderData.d ? salesOrderData.d.SoldToParty : '',\n  suggestedDiscountPercent: recommendation.suggestedDiscountPercent !== undefined ? recommendation.suggestedDiscountPercent : null,\n  rationale: recommendation.rationale || agentResponse.message || '',\n  marginImpact: recommendation.marginImpact || '',\n  riskFlag: recommendation.riskFlag || 'unknown',\n  timestamp: new Date().toISOString()\n};\n\nreturn [{ json: output }];"
+            }
+        },
+        {
+            "id": "n9",
+            "name": "Return Recommendation",
+            "type": "n8n-nodes-base.respondToWebhook",
+            "typeVersion": 1.5,
+            "position": [1920, 40],
+            "parameters": {
+                "respondWith": "json",
+                "responseBody": "={{ JSON.stringify($json) }}",
+                "options": {
+                    "responseCode": 200
+                }
+            }
+        },
+        {
+            "id": "n10",
+            "name": "Error Response",
+            "type": "n8n-nodes-base.respondToWebhook",
+            "typeVersion": 1.5,
+            "position": [720, 440],
+            "parameters": {
+                "respondWith": "json",
+                "responseBody": "{ \"error\": \"Failed to generate discount recommendation\" }",
+                "options": {
+                    "responseCode": 500
+                }
+            }
+        }
+    ],
+    "connections": {
+        "Sales Order Trigger": {
+            "main": [[{"node": "Mock Sales Order Data", "type": "main", "index": 0}]]
+        },
+        "Mock Sales Order Data": {
+            "main": [[{"node": "Order Data Valid", "type": "main", "index": 0}]]
+        },
+        "Order Data Valid": {
+            "main": [
+                [{"node": "Mock Pricing Conditions", "type": "main", "index": 0}],
+                [{"node": "Error Response", "type": "main", "index": 0}]
+            ]
+        },
+        "Mock Pricing Conditions": {
+            "main": [[{"node": "Prepare Agent Payload", "type": "main", "index": 0}]]
+        },
+        "Prepare Agent Payload": {
+            "main": [[{"node": "Call Discount Agent", "type": "main", "index": 0}]]
+        },
+        "Call Discount Agent": {
+            "main": [[{"node": "Agent Response Valid", "type": "main", "index": 0}]]
+        },
+        "Agent Response Valid": {
+            "main": [
+                [{"node": "Format Recommendation", "type": "main", "index": 0}],
+                [{"node": "Error Response", "type": "main", "index": 0}]
+            ]
+        },
+        "Format Recommendation": {
+            "main": [[{"node": "Return Recommendation", "type": "main", "index": 0}]]
+        }
+    },
+    "settings": {"executionOrder": "v1"},
+    "pinData": {},
+    "id": "7t8tjBJRkWhtk875"
+}
