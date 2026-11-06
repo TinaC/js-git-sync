@@ -1,8 +1,8 @@
 # AI-Powered Discount Strategy Suggestion Agent
 
-AI-powered discount strategy agent for SAP S/4HANA SD sales discount recommendations
+AI-powered discount strategy agent for SAP S/4HANA SD sales discount recommendationsdfdf
 
-## Business challenge
+## dfdfd Business challenge
 
 Sales representatives lack real-time, data-driven discount guidance when negotiating with customers. They need an AI agent that reads customer orders and margin targets from SAP S/4HANA Sales & Distribution (SD) and returns contextualized, margin-safe discount recommendations — reducing revenue leakage and accelerating deal closure.
 
@@ -30,7 +30,7 @@ The discount strategy challenge maps to the Lead to Cash E2E, specifically the "
 ## Fit Gap Analysis
 
 | Requirement (business) | Standard asset(s) found | API ORD ID | MCP Server ORD ID | MCP Server Version | Gap? | Notes / assumptions |
-|---|---|---|---|---|---|---|
+| --- | --- | --- | --- | --- | --- | --- |
 | Read customer sales orders from S/4HANA SD | SAP S/4HANA Cloud – Sales Order Management (SC1001, SC5146) | `sap.s4:apiResource:API_SALES_ORDER_SRV:v1` | — | — | No | Standard OData API available |
 | Read pricing conditions and discount types | SAP S/4HANA Cloud – Sales Price Calculation (SC1036, SC5494) | `sap.s4:apiResource:API_SLSPRICINGCONDITIONRECORD_SRV:v1` | — | — | No | Condition record API available |
 | Read pricing procedures | SAP S/4HANA Cloud – Sales Price Planning (SC1044, SC5495) | `sap.s4:apiResource:API_SLSPRICINGPROCEDURE_SRV:v1` | — | — | No | Standard OData API available |
@@ -38,11 +38,16 @@ The discount strategy challenge maps to the Lead to Cash E2E, specifically the "
 | Deliver recommendations to sales rep in workflow | n8n workflow orchestration | — | — | — | No | n8n handles orchestration and delivery |
 
 ### Key findings
-- S/4HANA SD provides rich OData APIs for sales orders, pricing conditions, and rebates — no MCP servers found, direct API calls used
-- AI reasoning layer (discount recommendation engine) is a genuine gap; must be built as a custom Python agent on SAP BTP AI Core
-- n8n is the ideal orchestrator: fetch order data → invoke AI agent → return recommendations to sales rep
-- SAP S/4HANA Sales Price Calculation and Sales Order Management capabilities cover data sourcing needs out-of-the-box
-- No SAP standard product offers contextual AI discount advisory today — custom AI agent is the right complement
+
+-   S/4HANA SD provides rich OData APIs for sales orders, pricing conditions, and rebates — no MCP servers found, direct API calls used
+    
+-   AI reasoning layer (discount recommendation engine) is a genuine gap; must be built as a custom Python agent on SAP BTP AI Core
+    
+-   n8n is the ideal orchestrator: fetch order data → invoke AI agent → return recommendations to sales rep
+    
+-   SAP S/4HANA Sales Price Calculation and Sales Order Management capabilities cover data sourcing needs out-of-the-box
+    
+-   No SAP standard product offers contextual AI discount advisory today — custom AI agent is the right complement
 
 ## Recommendations
 
@@ -61,4 +66,5 @@ An n8n workflow triggers when a sales order is created or updated in SAP S/4HANA
 n8n Workflow, AI Agent
 
 #### Intent fit
+
 88%
